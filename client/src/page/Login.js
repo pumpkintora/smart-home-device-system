@@ -1,23 +1,28 @@
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { userAxiosInstance as axios } from "../utils/axios";
+import { useDispatch } from "react-redux";
+import { authAxiosInstance as axios } from "../utils/axios";
+import { setUser } from "../redux/userSlice";
 
 export default function Login(params) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const login = () => {
     axios
-      .post("http://localhost:3001/login", {
+      .post("login", {
         username: username,
         password: password,
       })
       .then((response) => {
-        if (!response.data.auth) {
+        if (!response.data.authenticated) {
           alert("Wrong credentials.");
         } else {
           console.log(response.data);
           localStorage.setItem("token", response.data.token);
+          dispatch(setUser(response.data.user))
           navigate("/");
         }
       });

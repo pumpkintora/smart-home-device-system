@@ -64,14 +64,14 @@ app.post('/register', (req, res)=> {
 
 const verifyJWT = (req, res, next) => {
     const token = req.headers["x-access-token"];
-
+    
     if (!token) {
-        res.send("We need a token, please give it to us next time");
+        res.send({ authenticated: false });
     } else {
         jwt.verify(token, "jwtSecret", (err, decoded) => {
             if (err) {
                 console.log(err);
-                res.json({ auth: false, message: "you are failed to authenticate"});
+                res.json({ authenticated: false });
             } else {
                 req.userId = decoded.id;
                 next();
@@ -81,7 +81,7 @@ const verifyJWT = (req, res, next) => {
 };
 
 app.get('/isUserAuth', verifyJWT , (req, res) => {
-    res.send("You are authenticated Congrats:")
+    res.send({ authenticated: true })
 })
 
 app.get("/login", (req, res) => {
@@ -114,13 +114,20 @@ app.post('/login', (req, res) => {
                         req.session.user = result;
 
                         console.log(req.session.user);
-                        res.json({auth: true, token: token, result: result});
+                        res.json({
+                            authenticated: true, 
+                            token: token, 
+                            user: { 
+                                username: result[0].username,
+                                user_id: result[0].user_id,
+                            }
+                        });
                     } else{
-                        res.json({auth: false, message: "Wrong username password"}); 
+                        res.json({authenticated: false, message: "Wrong username password"}); 
                     }
                 })
             } else {
-                res.json({auth: false, message: "no user exists"});
+                res.json({authenticated: false, message: "no user exists"});
             }
         }
     );

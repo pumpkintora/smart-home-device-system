@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const userAxiosInstance = axios.create({
+const authAxiosInstance = axios.create({
   baseURL: "http://localhost:3001", // user management server
 });
 
@@ -9,5 +9,6 @@ const businessLogicAxiosInstance = axios.create({
 });
 
 businessLogicAxiosInstance.defaults.withCredentials = true;
+businessLogicAxiosInstance.defaults.headers["x-access-token"] = localStorage.getItem("token");
 
-export { userAxiosInstance, businessLogicAxiosInstance };
+export { authAxiosInstance, businessLogicAxiosInstance };

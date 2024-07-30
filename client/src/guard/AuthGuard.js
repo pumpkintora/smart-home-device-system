@@ -1,22 +1,21 @@
-export default function AuthGuard({ children }) {
-  const [loginStatus, setLoginStatus] = useState(false);
+import React from "react";
+import { Navigate } from "react-router-dom";
+import { authAxiosInstance as axios } from "../utils/axios";
 
-  const userAuthenticeted = () => {
-    Axios.get("http://localhost:3001/isUserAuth", {
+export default function AuthGuard({ children }) {
+  const [isAuthenticated, setIsAuthenticated] = React.useState(true);
+  console.log(localStorage.getItem("token"))
+  React.useEffect(() => {
+    axios.get("isUserAuth", {
       headers: {
         "x-access-token": localStorage.getItem("token"),
       },
     }).then((response) => {
-      console.log(response);
+      setIsAuthenticated(response.data.authenticated);
     });
-  };
+  }, [isAuthenticated])
 
-  return (
-    <>
-      {loginStatus && (
-        <button onClick={userAuthenticeted}>Check if authenticated</button>
-      )}
-      {children}
-    </>
-  );
+  if (!isAuthenticated) return <Navigate to="/login" />
+  return (<>{children}</>);
+
 }

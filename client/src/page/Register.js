@@ -1,9 +1,9 @@
-import { useNavigate } from "react-router-dom";
-import { userAxiosInstance as axios } from "../utils/axios";
+import React from "react";
+import { authAxiosInstance as axios } from "../utils/axios";
 
 export default function Register(params) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
   
   const register = () => {
     axios.post("http://localhost:3001/register", {
