@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
@@ -14,6 +16,7 @@ const jwt = require('jsonwebtoken');
 const app = express();
 
 app.use(express.json());
+// app.use(cors());
 app.use(
     cors({
         origin: ["http://localhost:3000"],
@@ -37,10 +40,11 @@ app.use (
 );
 
 const db = mysql.createConnection({
-    user: "root",
-    host: "localhost",
-    password: "admin",
-    database: "smarthome", 
+    user: process.env.DB_USER || "root",
+    host: process.env.DB_HOST || "localhost",
+    password: process.env.DB_PASSWORD || "admin",
+    database: process.env.DB_NAME || "smarthome", 
+    port: process.env.DB_PORT || 3306
 });
 
 app.post('/register', (req, res)=> {
@@ -64,7 +68,7 @@ app.post('/register', (req, res)=> {
 
 const verifyJWT = (req, res, next) => {
     const token = req.headers["x-access-token"];
-    
+
     if (!token) {
         res.send({ authenticated: false });
     } else {
@@ -73,7 +77,7 @@ const verifyJWT = (req, res, next) => {
                 console.log(err);
                 res.json({ authenticated: false });
             } else {
-                req.userId = decoded.id;
+                req.userId = decoded.user_id;
                 next();
             }
         });
@@ -107,13 +111,9 @@ app.post('/login', (req, res) => {
             if (result.length > 0) {
                 bcrypt.compare(password, result[0].password, (error, response) => {
                     if (response) {
-                        const id = result[0].id
-                        const token = jwt.sign({id}, "jwtSecret", {
+                        const token = jwt.sign({ user_id: result[0].user_id }, "jwtSecret", {
                             expiresIn: 300,
                         })
-                        req.session.user = result;
-
-                        console.log(req.session.user);
                         res.json({
                             authenticated: true, 
                             token: token, 
@@ -133,6 +133,8 @@ app.post('/login', (req, res) => {
     );
 });
 
-app.listen(3001, () => {
-    console.log("running server at 3001");
+const PORT = process.env.SERVER_DOCKER_PORT || 3001;
+
+app.listen(PORT, () => {
+    console.log(`running server at ${PORT}`);
 });

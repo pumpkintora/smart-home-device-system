@@ -1,14 +1,25 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { businessLogicAxiosInstance as axios } from '../utils/axios' 
+import { businessLogicAxiosInstance as axios } from "../utils/axios";
 
 export default function Home(params) {
-    const { user } = useSelector(state => state.user)
+  const { user } = useSelector((state) => state.user);
+  const [locations, setLocations] = React.useState([]);
+  const navigate = useNavigate();
 
-    React.useEffect(() => {
-        axios.get("/room/all")
-    }, [])
+  React.useEffect(() => {
+    axios.get("/location/all").then((res) => console.log(res.data));
+  }, []);
 
-    return <>home</>
-};
+  return (
+    <div>
+      <div>home</div>
+      {locations.map((loc) => (
+        <button onClick={navigate(`/location/${loc.location_id}`)}>
+          {loc.location_name}
+        </button>
+      ))}
+    </div>
+  );
+}

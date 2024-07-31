@@ -1,0 +1,105 @@
+version: "3"
+
+services:
+  user-management-backend:
+    depends_on:
+      - mysqldb
+    build:
+      context: user-management-server
+    restart: on-failure
+    container_name: user-management-backend
+    working_dir: /usr/src/app
+    env_file: ./.env
+    environment:
+      - DB_HOST=mysqldb
+      - DB_USER=$MYSQLDB_USER
+      - DB_PASSWORD=$MYSQLDB_ROOT_PASSWORD
+      - DB_NAME=$MYSQLDB_DATABASE
+      - DB_PORT=$MYSQLDB_DOCKER_PORT
+    networks:
+      - node-network
+    tty: true
+    ports:
+      - $USER_SERVER_LOCAL_PORT:$USER_SERVER_DOCKER_PORT
+    command: npm run prod
+  
+  business-logic-backend:
+    depends_on:
+      - mysqldb
+    build:
+      context: business-logic-server
+    restart: on-failure
+    container_name: business-logic-backend
+    working_dir: /usr/src/app
+    env_file: ./.env
+    environment:
+      - DB_HOST=mysqldb
+      - DB_USER=$MYSQLDB_USER
+      - DB_PASSWORD=$MYSQLDB_ROOT_PASSWORD
+      - DB_NAME=$MYSQLDB_DATABASE
+      - DB_PORT=$MYSQLDB_DOCKER_PORT
+    networks:
+      - node-network
+    tty: true
+    ports:
+      - $BUSINESS_SERVER_LOCAL_PORT:$BUSINESS_SERVER_DOCKER_PORT
+    command: npm run prod
+
+  frontend:
+    build:
+      context: client
+      args:
+        - REACT_APP_USER_SERVER_API=http://localhost:3001
+        - REACT_APP_BUSINESS_SERVER_API=http://localhost:3002
+    container_name: frontend
+    working_dir: /usr/src/app
+    networks:
+      - node-network
+    tty: true
+    ports:
+      - $CLIENT_LOCAL_PORT:$CLIENT_DOCKER_PORT
+    command: npm start
+  
+  mysqldb:
+    image: mysql:8.0.33
+    # build: 
+    #   context: sql
+    ports:
+      - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
+    restart: always
+    env_file: ./.env
+    environment:
+      - MYSQL_ROOT_PASSWORD=$MYSQLDB_ROOT_PASSWORD
+      - MYSQL_DATABASE=$MYSQLDB_DATABASE
+    volumes:
+      - mysql-data:/var/lib/mysql
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - node-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      retries: 10
+      interval: 3s
+      timeout: 30s
+
+  # nginx:
+  #   build:
+  #     context: nginx
+  #   container_name: nginx
+  #   restart: always
+  #   tty: true
+  #   ports:
+  #     - "8000:80"
+  #   networks:
+  #     - node-network
+  #   depends_on:
+  #     - user-management-backend
+  #     - business-logic-backend
+  #     - frontend
+
+networks:
+  node-network:
+    driver: bridge
+
+volumes:
+  mysql-data:

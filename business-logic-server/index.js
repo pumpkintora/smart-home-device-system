@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
@@ -14,6 +16,7 @@ const jwt = require('jsonwebtoken');
 const app = express();
 
 app.use(express.json());
+// app.use(cors());
 app.use(
     cors({
         origin: ["http://localhost:3000"],
@@ -37,36 +40,51 @@ app.use (
 );
 
 const db = mysql.createConnection({
-    user: "root",
-    host: "localhost",
-    password: "admin",
-    database: "smarthome", 
+    user: process.env.DB_USER || "root",
+    host: process.env.DB_HOST || "localhost",
+    password: process.env.DB_PASSWORD || "admin",
+    database: process.env.DB_NAME || "smarthome", 
+    port: process.env.DB_PORT || 3306
 });
 
 const verifyJWT = (req, res, next) => {
     const token = req.headers["x-access-token"];
 
     if (!token) {
-        res.send("We need a token, please give it to us next time");
+        res.send({ authenticated: false });
     } else {
         jwt.verify(token, "jwtSecret", (err, decoded) => {
             if (err) {
                 console.log(err);
-                res.json({ auth: false, message: "you are failed to authenticate"});
+                res.json({ authenticated: false });
             } else {
-                req.userId = decoded.id;
+                req.userId = decoded.user_id;
                 next();
             }
         });
     }
 };
 
-app.get('/location/all', verifyJWT , (req, res) => {});
+app.get('/location/all', verifyJWT, (req, res) => {
+    const user_id = req.userId;
+    db.execute(
+        "SELECT * FROM locations WHERE user_id = ?;",
+        [user_id], 
+        (err, result)=> {
+            if (err) {
+                res.send({err: err});
+            } 
+            res.send(result);
+        }
+    );
+});
 
 app.get('/location/:locationId', verifyJWT , (req, res) => {});
 
 app.post('/location/', verifyJWT , (req, res) => {});
 
-app.listen(3002, () => {
-    console.log("running server on 3002");
+const PORT = process.env.SERVER_DOCKER_PORT || 3002;
+
+app.listen(PORT, () => {
+    console.log(`running server at ${PORT}`);
 });

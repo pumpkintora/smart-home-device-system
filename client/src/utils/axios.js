@@ -1,11 +1,11 @@
 import axios from "axios";
 
 const authAxiosInstance = axios.create({
-  baseURL: "http://localhost:3001", // user management server
+  baseURL: process.env.REACT_APP_USER_SERVER_API || "http://localhost:3001", // user management server
 });
 
 const businessLogicAxiosInstance = axios.create({
-  baseURL: "http://localhost:3002", // business logic server
+  baseURL: process.env.REACT_APP_BUSINESS_SERVER_API || "http://localhost:3002", // business logic server
 });
 
 businessLogicAxiosInstance.defaults.withCredentials = true;
