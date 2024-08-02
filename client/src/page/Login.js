@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { authAxiosInstance as axios } from "../utils/axios";
+import { businessLogicAxiosInstance as bizAxios, authAxiosInstance as authAxios } from "../utils/axios";
 import { setUser } from "../redux/userSlice";
 
 export default function Login(params) {
@@ -11,7 +11,7 @@ export default function Login(params) {
   const dispatch = useDispatch();
 
   const login = () => {
-    axios
+    authAxios
       .post("login", {
         username: username,
         password: password,
@@ -20,8 +20,8 @@ export default function Login(params) {
         if (!response.data.authenticated) {
           alert("Wrong credentials.");
         } else {
-          console.log(response.data);
           localStorage.setItem("token", response.data.token);
+          bizAxios.defaults.headers["x-access-token"] = response.data.token;
           dispatch(setUser(response.data.user))
           navigate("/");
         }

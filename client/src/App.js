@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import "./App.css";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+
 import Routes from "./routes";
 
 function App() {
   return (
-    <div className="App">
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Routes />
-    </div>
+    </LocalizationProvider>
   );
 }
 

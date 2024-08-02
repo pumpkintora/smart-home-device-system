@@ -6,6 +6,7 @@ import AuthGuard from "../guard/AuthGuard";
 import LoginPage from '../page/Login';
 import RegisterPage from '../page/Register';
 import HomePage from '../page/Home';
+import LocationPage from '../page/Location';
 
 function Routes() {
   return useRoutes([
@@ -25,6 +26,14 @@ function Routes() {
         </AuthGuard>
       ),
     },
+    {
+      path: "/location/:locationId",
+      element: (
+        <AuthGuard>
+          <LocationPage />
+        </AuthGuard>
+      ),
+    }
   ]);
 }
 

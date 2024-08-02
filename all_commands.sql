@@ -21,9 +21,11 @@ CREATE TABLE devicetypes (
 );
 
 CREATE TABLE devices (
-    device_name VARCHAR(255) NOT NULL,
+    device_id INT AUTO_INCREMENT PRIMARY KEY,
     devicetype_id INT,
     location_id INT,
+    schedule_on TIMESTAMP,
+    schedule_off TIMESTAMP,
     FOREIGN KEY (devicetype_id) REFERENCES devicetypes(devicetype_id),
     FOREIGN KEY (location_id) REFERENCES locations(location_id)
 );
