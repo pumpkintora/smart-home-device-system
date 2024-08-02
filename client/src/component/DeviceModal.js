@@ -44,7 +44,7 @@ export default function DeviceModal({
   const [deviceType, setDeviceType] = React.useState(1);
   const [scheduleOn, setScheduleOn] = React.useState(null);
   const [scheduleOff, setScheduleOff] = React.useState(null);
-  const [manualStatus, setManualStatus] = React.useState(null);
+  const [status, setStatus] = React.useState(null);
 
   const handleEditDevice = () => {
     axios
@@ -53,6 +53,7 @@ export default function DeviceModal({
         schedule_off: scheduleOff,
         devicetype_id: deviceType,
         location_id: locationId,
+        status,
       })
       .then((res) =>
         setDevices((prevDevices) =>
@@ -73,6 +74,7 @@ export default function DeviceModal({
         schedule_off: scheduleOff,
         devicetype_id: deviceType,
         location_id: locationId,
+        status,
       })
       .then((res) => setDevices((prev) => [...prev, res.data]))
       .then(() => handleClose());
@@ -89,6 +91,16 @@ export default function DeviceModal({
       .then(() => handleClose());
   };
 
+  const handleToggle = (e, newValue) => {
+    if (status !== newValue) {
+      axios
+        .post(`/device/${device.device_id}/${newValue}`)
+        .then((res) =>
+          setStatus(newValue)
+        );
+    }
+  };
+
   React.useEffect(() => {
     if (isEditDevice) {
       setDeviceType(device.devicetype_id);
@@ -98,7 +110,7 @@ export default function DeviceModal({
       setScheduleOff(
         device.schedule_off !== null ? dayjs(device.schedule_off) : null
       );
-      setManualStatus(device.manual_status);
+      setStatus(device.status);
     }
   }, [open]);
 
@@ -142,13 +154,13 @@ export default function DeviceModal({
             </FormControl>
             <ToggleButtonGroup
               color="primary"
-              value={manualStatus}
+              value={status}
               exclusive
-              onChange={(e, newValue) => setManualStatus(newValue)}
+              onChange={handleToggle}
               aria-label="Platform"
             >
-              <ToggleButton value={true}>On</ToggleButton>
-              <ToggleButton value={false}>Off</ToggleButton>
+              <ToggleButton value={"on"}>On</ToggleButton>
+              <ToggleButton value={"off"}>Off</ToggleButton>
             </ToggleButtonGroup>
             <Stack spacing={1} direction={"row"} sx={{ width: "100%" }}>
               {isEditDevice && (

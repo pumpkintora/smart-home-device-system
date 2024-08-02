@@ -26,6 +26,8 @@ CREATE TABLE devices (
     location_id INT,
     schedule_on TIMESTAMP,
     schedule_off TIMESTAMP,
+    status ENUM('on', 'off') DEFAULT 'off',
+    manual_override BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (devicetype_id) REFERENCES devicetypes(devicetype_id),
     FOREIGN KEY (location_id) REFERENCES locations(location_id)
 );

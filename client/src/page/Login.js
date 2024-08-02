@@ -22,6 +22,7 @@ export default function Login(params) {
         } else {
           localStorage.setItem("token", response.data.token);
           bizAxios.defaults.headers["x-access-token"] = response.data.token;
+          console.log(response.data.user)
           dispatch(setUser(response.data.user))
           navigate("/");
         }

@@ -1,5 +1,5 @@
 const db = require("../db/mysql");
-const formatDateForSql = require("../utils/formatDateForSql")
+const formatDateForSql = require("../utils/formatDateForSql");
 
 const getAllLocationByUserId = (req, res) => {
   const user_id = req.userId;
@@ -13,6 +13,96 @@ const getAllLocationByUserId = (req, res) => {
       res.send(result);
     }
   );
+};
+
+const createLocationByUserId = (req, res) => {
+  const { location_name } = req.body;
+  const user_id = req.userId;
+  const query = `INSERT INTO locations (location_name, user_id) VALUES (?, ?);`;
+  db.query(query, [location_name, user_id], (err, result) => {
+    if (err) {
+      console.error("Error inserting:", err);
+      return res.status(500).json({ error: "Failed to add device" });
+    }
+    // console.log(result)
+    db.query(
+      "SELECT * FROM locations WHERE location_id = ?;",
+      [result.insertId],
+      (err, result) => {
+        if (err) {
+          res.send({ err: err });
+        }
+        res.send(result);
+      }
+    );
+  });
+};
+
+const updateLocationByLocationId = (req, res) => {
+  const location_id = req.params.locationId;
+  const { location_name, user_id } = req.body;
+  // Validate that at least one field is provided for update
+  if (location_name === undefined) {
+    return res
+      .status(400)
+      .json({ error: "At least one field must be provided for update" });
+  }
+
+  if (user_id === undefined) {
+    return res.status(400).json({ error: "User ID required." });
+  }
+
+  const updates = [];
+  const values = [];
+
+  if (location_name) {
+    updates.push("location_name = ?");
+    values.push(location_name);
+  }
+
+  values.push(location_id);
+  values.push(user_id);
+
+  const query = `
+        UPDATE locations 
+        SET ${updates.join(", ")} 
+        WHERE location_id = ? AND user_id = ?;
+        
+    `;
+
+  db.query(query, values, (err, result) => {
+    if (err) {
+      res.send({ err: err });
+    }
+    db.query(
+      `SELECT * FROM locations WHERE location_id = ? AND user_id = ?;`,
+      [location_id, user_id],
+      (err, result) => {
+        if (err) {
+          res.send({ err: err });
+        }
+        res.send(result);
+      }
+    );
+  });
+};
+
+const deleteLocationByLocationId = (req, res) => {
+  const { locationId } = req.params;
+
+  const query = "DELETE FROM locations WHERE location_id = ?";
+  db.query(query, [locationId], (err, result) => {
+    if (err) {
+      console.error("Error deleting device:", err);
+      res.status(500).send("Server error");
+      return;
+    }
+    if (result.affectedRows === 0) {
+      res.status(404).send("Device not found");
+      return;
+    }
+    res.send("Device deleted successfully");
+  });
 };
 
 const getLocationByLocationId = (req, res) => {
@@ -31,7 +121,6 @@ const getLocationByLocationId = (req, res) => {
 
 const addDeviceToLocation = (req, res) => {
   const { schedule_on, schedule_off, devicetype_id, location_id } = req.body;
-  console.log(req.body);
   // Validate required fields
   if (
     schedule_on === undefined ||
@@ -50,7 +139,12 @@ const addDeviceToLocation = (req, res) => {
 
   db.query(
     query,
-    [formatDateForSql(schedule_on), formatDateForSql(schedule_off), devicetype_id, location_id],
+    [
+      formatDateForSql(schedule_on),
+      formatDateForSql(schedule_off),
+      devicetype_id,
+      location_id,
+    ],
     (err, result) => {
       if (err) {
         console.error("Error executing query:", err);
@@ -88,7 +182,10 @@ const addDeviceToLocation = (req, res) => {
 };
 
 module.exports = {
+  createLocationByUserId,
   getAllLocationByUserId,
+  updateLocationByLocationId,
+  deleteLocationByLocationId,
   getLocationByLocationId,
   addDeviceToLocation,
 };

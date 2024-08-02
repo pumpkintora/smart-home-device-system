@@ -7,11 +7,13 @@ import {
   CardActionArea,
   Typography,
   Button,
+  Box,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import ResponsiveAppBar from "../component/ResponsiveAppBar";
 import DeviceCard from "../component/DeviceCard";
 import DeviceModal from "../component/DeviceModal";
+import LocationModal from "../component/LocationModal";
 import { businessLogicAxiosInstance as axios } from "../utils/axios";
 
 export default function Location() {
@@ -19,19 +21,24 @@ export default function Location() {
   const [devices, setDevices] = React.useState([]);
   const [allDeviceType, setAllDeviceType] = React.useState([]);
   const [location, setLocation] = React.useState(null);
-  const [open, setOpen] = React.useState(false);
+  const [openDevice, setOpenDevice] = React.useState(false);
+  const [openLocation, setOpenLocation] = React.useState(false);
   const [device, setDevice] = React.useState(null);
-  const { navigate } = useNavigate();
+  const navigate = useNavigate();
   const { locationId } = useParams();
 
   const addNewDevice = () => {
     setDevice(null);
-    setOpen(true);
+    setOpenDevice(true);
   };
 
   const editDevice = (id) => {
     setDevice(devices.find((dev) => dev.device_id === id));
-    setOpen(true);
+    setOpenDevice(true);
+  };
+
+  const editLocation = (id) => {
+    setOpenLocation(true);
   };
 
   const handleDeleteLocation = () => {
@@ -60,9 +67,26 @@ export default function Location() {
       {!loading && (
         <Container maxWidth="lg">
           <Grid container spacing={2} sx={{ padding: 2 }}>
-            <Grid item xs={12} display={"flex"} justifyContent={"space-between"}>
+            <Grid
+              item
+              xs={12}
+              display={"flex"}
+              justifyContent={"space-between"}
+            >
               <Typography variant="h4">{location?.location_name}</Typography>
-              <Button color="error" variant="contained" onClick={handleDeleteLocation}>Delete Location</Button>
+              <Box>
+                <Button variant="outlined" onClick={editLocation}>
+                  Edit Location
+                </Button>
+                <Button
+                  color="error"
+                  variant="contained"
+                  onClick={handleDeleteLocation}
+                  sx={{ ml: 2 }}
+                >
+                  Delete Location
+                </Button>
+              </Box>
             </Grid>
             {devices?.map((device) => (
               <Grid key={device.device_id} item xs={12} md={6}>
@@ -81,11 +105,16 @@ export default function Location() {
             </Grid>
           </Grid>
           <DeviceModal
-            open={open}
-            setOpen={setOpen}
+            open={openDevice}
+            setOpen={setOpenDevice}
             device={device}
             allDeviceType={allDeviceType}
             setDevices={setDevices}
+          />
+          <LocationModal
+            open={openLocation}
+            setOpen={setOpenLocation}
+            originalLocation={location}
           />
         </Container>
       )}

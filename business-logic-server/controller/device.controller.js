@@ -1,5 +1,5 @@
 const db = require("../db/mysql");
-const formatDateForSql = require("../utils/formatDateForSql")
+const formatDateForSql = require("../utils/formatDateForSql");
 
 const getAllDeviceByLocationId = (req, res) => {
   const location_id = req.params.locationId;
@@ -26,14 +26,14 @@ const getAllDeviceType = (req, res) => {
 
 const updateDeviceByDeviceId = (req, res) => {
   const device_id = req.params.deviceId;
-  const { schedule_on, schedule_off, devicetype_id, manual_status } = req.body;
+  const { schedule_on, schedule_off, devicetype_id, status } = req.body;
 
   // Validate that at least one field is provided for update
   if (
     schedule_on === undefined &&
     schedule_off === undefined &&
     devicetype_id === undefined &&
-    manual_status === undefined
+    status === undefined
   ) {
     return res
       .status(400)
@@ -56,9 +56,9 @@ const updateDeviceByDeviceId = (req, res) => {
     updates.push("devicetype_id = ?");
     values.push(devicetype_id);
   }
-  if (manual_status) {
-    updates.push("manual_status = ?");
-    values.push(manual_status);
+  if (status) {
+    updates.push("status = ?");
+    values.push(status);
   }
 
   // Add the device_id to the values array for the WHERE clause
@@ -102,27 +102,93 @@ const updateDeviceByDeviceId = (req, res) => {
   });
 };
 
-const deleteDeviceByDeviceId =  (req, res) => {
+const deleteDeviceByDeviceId = (req, res) => {
   const { deviceId } = req.params;
 
-  const query = 'DELETE FROM devices WHERE device_id = ?';
+  const query = "DELETE FROM devices WHERE device_id = ?";
   db.query(query, [deviceId], (err, result) => {
-      if (err) {
-          console.error('Error deleting device:', err);
-          res.status(500).send('Server error');
-          return;
-      }
-      if (result.affectedRows === 0) {
-          res.status(404).send('Device not found');
-          return;
-      }
-      res.send('Device deleted successfully');
+    if (err) {
+      console.error("Error deleting device:", err);
+      res.status(500).send("Server error");
+      return;
+    }
+    if (result.affectedRows === 0) {
+      res.status(404).send("Device not found");
+      return;
+    }
+    res.send("Device deleted successfully");
   });
-}
+};
+
+const turnOnDevice = (req, res) => {
+  const { deviceId } = req.params;
+  const query = `
+      UPDATE devices
+      SET status = 'on', manual_override = TRUE
+      WHERE device_id = ?
+  `;
+  db.query(query, [deviceId], (err, result) => {
+    if (err) {
+      console.error("Error turning device on:", err);
+      res.status(500).send("Server error");
+      return;
+    }
+    if (result.affectedRows === 0) {
+      res.status(404).send("Device not found");
+      return;
+    }
+    db.execute(
+      "SELECT * FROM devices WHERE device_id = ?",
+      [deviceId],
+      (err, result) => {
+        if (err) {
+          console.error("Error turning device on:", err);
+          res.status(500).send("Server error");
+          return;
+        }
+        res.send(result[0]);
+      }
+    );
+  });
+};
+
+const turnOffDevice = (req, res) => {
+  const { deviceId } = req.params;
+  const query = `
+      UPDATE devices
+      SET status = 'off', manual_override = TRUE
+      WHERE device_id = ?
+  `;
+  db.query(query, [deviceId], (err, result) => {
+    if (err) {
+      console.error("Error turning device off:", err);
+      res.status(500).send("Server error");
+      return;
+    }
+    if (result.affectedRows === 0) {
+      res.status(404).send("Device not found");
+      return;
+    }
+    db.execute(
+      "SELECT * FROM devices WHERE device_id = ?",
+      [deviceId],
+      (err, result) => {
+        if (err) {
+          console.error("Error turning device on:", err);
+          res.status(500).send("Server error");
+          return;
+        }
+        res.send(result[0]);
+      }
+    );
+  });
+};
 
 module.exports = {
   getAllDeviceByLocationId,
   getAllDeviceType,
   updateDeviceByDeviceId,
   deleteDeviceByDeviceId,
+  turnOnDevice,
+  turnOffDevice,
 };
