@@ -41,7 +41,7 @@ app.use(
 
 
 // Schedule the toggle functions to run every minute
-cron.schedule('* * * * *', () => {
+cron.schedule('0 * * * *', () => {
   toggleDevicesOn();
   toggleDevicesOff();
 });

@@ -7,6 +7,7 @@ import LoginPage from '../page/Login';
 import RegisterPage from '../page/Register';
 import HomePage from '../page/Home';
 import LocationPage from '../page/Location';
+import ProfilePage from '../page/Profile';
 
 function Routes() {
   return useRoutes([
@@ -33,6 +34,19 @@ function Routes() {
           <LocationPage />
         </AuthGuard>
       ),
+    },
+    {
+      path: "/user",
+      children: [
+        {
+          path: "profile",
+          element: (
+            <AuthGuard>
+              <ProfilePage />
+            </AuthGuard>
+          ),
+        }
+      ]
     }
   ]);
 }

@@ -4,8 +4,10 @@ USE smarthome;
 
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_name VARCHAR(50),
-    password VARCHAR(255)
+    username VARCHAR(50),
+    password VARCHAR(255),
+    email VARCHAR(100) UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE locations (
