@@ -15,4 +15,18 @@ authAxiosInstance.defaults.headers["x-access-token"] = localStorage.getItem("tok
 businessLogicAxiosInstance.defaults.withCredentials = true;
 businessLogicAxiosInstance.defaults.headers["x-access-token"] = localStorage.getItem("token");
 
+
+// businessLogicAxiosInstance.interceptors.response.use(
+//   response => response,
+//   error => {
+//     if (error.response && error.response.status === 401) {
+//       // Log out the user
+//       localStorage.removeItem('authToken'); // Or however you store the JWT
+//       /* eslint-disable-next-line no-restricted-globals */
+//       history.push('/login'); // Redirect to login page
+//     }
+//     return Promise.reject(error);
+//   }
+// );
+
 export { authAxiosInstance, businessLogicAxiosInstance };

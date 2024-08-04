@@ -107,7 +107,7 @@ app.post("/login", (req, res) => {
               { user_id: result[0].user_id },
               "jwtSecret",
               {
-                expiresIn: 300,
+                expiresIn: 10,
               }
             );
             delete result[0].password;

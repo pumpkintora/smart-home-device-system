@@ -6,7 +6,7 @@ import {
   Grid,
   Card,
   CardActionArea,
-  Typography
+  Typography,
 } from "@mui/material";
 import { businessLogicAxiosInstance as axios } from "../utils/axios";
 import ResponsiveAppBar from "../component/ResponsiveAppBar";
@@ -25,10 +25,16 @@ export default function Home() {
   };
 
   React.useEffect(() => {
-    axios.get("/location/all").then((res) => {
-      setLoading(false);
-      setLocations(res.data);
-    });
+    const fetchData = async () => {
+      try {
+        const res = await axios.get("/location/all");
+        setLoading(false);
+        setLocations(res.data);
+      } catch (err) {
+        console.log(err.response.data);
+      }
+    };
+    fetchData();
   }, []);
 
   return (
@@ -50,7 +56,11 @@ export default function Home() {
               </Card>
             </Grid>
           </Grid>
-          <LocationModal open={open} setOpen={setOpen} setLocations={setLocations} />
+          <LocationModal
+            open={open}
+            setOpen={setOpen}
+            setLocations={setLocations}
+          />
         </Container>
       )}
     </>

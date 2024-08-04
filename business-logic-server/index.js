@@ -4,11 +4,11 @@ const cron = require('node-cron');
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
+const io = require('socket.io')(3003);
 
 const { verifyJWT } = require("./middleware/verifyJWT");
 const locationController = require("./controller/location.controller")
 const deviceController = require("./controller/device.controller")
-
 const toggleDevicesOn = require("./cron/toggleDevicesOn")
 const toggleDevicesOff = require("./cron/toggleDevicesOff")
 const resetManualOverride = require("./cron/resetManualOverride")
@@ -39,6 +39,12 @@ app.use(
   })
 );
 
+io.on('connection', (socket) => {
+  console.log('Client connected');
+  socket.on('disconnect', () => {
+      console.log('Client disconnected');
+  });
+});
 
 // Schedule the toggle functions to run every minute
 cron.schedule('0 * * * *', () => {

@@ -36,6 +36,13 @@ function ResponsiveAppBar() {
     setAnchorElUser(null);
   };
 
+  const logout = () => {
+    clearTimeout(localStorage.getItem("timerId"))
+    localStorage.removeItem("token")
+    localStorage.removeItem("timerId")
+    navigate("/login")
+  }
+
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
@@ -111,6 +118,7 @@ function ResponsiveAppBar() {
             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
               <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
             </IconButton>
+            <Button color="secondary" variant="contained" onClick={logout} sx={{ ml: 2 }}>LOGOUT</Button>
           </Box>
         </Toolbar>
       </Container>

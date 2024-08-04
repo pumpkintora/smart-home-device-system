@@ -9,6 +9,8 @@ const toggleDevicesOff = () => {
         UPDATE devices
         SET status = 'off'
         WHERE TIME(schedule_off) <= ?
+        AND manual_override = FALSE
+        AND status = 'on'
     `;
     db.query(toggleOffQuery, [currentTime], (err, result) => {
         if (err) {
