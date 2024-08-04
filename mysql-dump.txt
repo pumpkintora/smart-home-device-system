@@ -1,1 +1,4 @@
 mysqldump -u root -p --databases smarthome > dump.sql
+
+# remember to check character set of .sql file. You can convert it with mysql workbench.
+# If character set is not correct database cannot be initialized.

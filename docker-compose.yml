@@ -61,19 +61,18 @@ services:
     command: npm start
   
   mysqldb:
-    image: mysql:8.0.33
+    image: mysql:latest
     # build: 
     #   context: sql
     ports:
       - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
     restart: always
-    env_file: ./.env
     environment:
-      - MYSQL_ROOT_PASSWORD=$MYSQLDB_ROOT_PASSWORD
-      - MYSQL_DATABASE=$MYSQLDB_DATABASE
+      MYSQL_DATABASE: smarthome
+      MYSQL_ROOT_PASSWORD: admin
     volumes:
-      - mysql-data:/var/lib/mysql
-      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      # - mysql-data:/var/lib/mysql
+      - ./sql-init:/docker-entrypoint-initdb.d/
     networks:
       - node-network
     healthcheck:
@@ -100,6 +99,3 @@ services:
 networks:
   node-network:
     driver: bridge
-
-volumes:
-  mysql-data:
