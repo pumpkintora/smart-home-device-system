@@ -34,6 +34,14 @@ CREATE TABLE devices (
     FOREIGN KEY (location_id) REFERENCES locations(location_id)
 );
 
+CREATE TABLE notifications (
+    notification_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    message VARCHAR(255),
+    isRead BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
 INSERT INTO locations (location_name, user_id) VALUES 
 ('Living Room', 1),
 ('Bedroom', 1),

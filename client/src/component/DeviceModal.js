@@ -147,14 +147,14 @@ export default function DeviceModal({
             <FormControl fullWidth>
               <TimePicker
                 label="Turn on at"
-                value={dayjs(scheduleOn)}
+                value={scheduleOn ? dayjs(scheduleOn) : null}
                 onChange={(newValue) => setScheduleOn(newValue.toString())}
               />
             </FormControl>
             <FormControl fullWidth>
               <TimePicker
                 label="Turn off at"
-                value={dayjs(scheduleOff)}
+                value={scheduleOff ? dayjs(scheduleOff) : null}
                 onChange={(newValue) => setScheduleOff(newValue.toString())}
               />
             </FormControl>

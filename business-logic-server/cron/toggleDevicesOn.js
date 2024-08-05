@@ -1,4 +1,7 @@
 const db = require("../db/mysql");
+const {
+  createDeviceStatusChangeNotification,
+} = require("../cron/notification");
 
 // Function to toggle devices on
 const toggleDevicesOn = () => {
@@ -7,55 +10,40 @@ const toggleDevicesOn = () => {
 
   const selectAffectedQuery = `
         SELECT * FROM devices
-        WHERE TIME(schedule_on) <= ?
-        AND manual_override = FALSE
-        AND (status = 'off' OR status IS NULL);
+        INNER JOIN locations ON locations.location_id = devices.location_id
+        INNER JOIN devicetypes ON devicetypes.devicetype_id = devices.devicetype_id
+        WHERE manual_override = FALSE AND status = 'off' AND ((TIME(schedule_on) < TIME(schedule_off) AND NOW() BETWEEN TIME(schedule_on) AND TIME(schedule_off))
+          OR
+          (TIME(schedule_off) < TIME(schedule_on) AND NOW() < TIME(schedule_on) AND NOW() < TIME(schedule_off))
+          OR
+          (TIME(schedule_off) < TIME(schedule_on) AND NOW() > TIME(schedule_on)));
     `;
 
   const toggleOnQuery = `
         UPDATE devices
         SET status = 'on'
-        WHERE TIME(schedule_on) <= ? 
-        AND manual_override = FALSE
-        AND (status = 'off' OR status IS NULL);
+        WHERE manual_override = FALSE AND status = 'off' AND ((TIME(schedule_on) < TIME(schedule_off) AND NOW() BETWEEN TIME(schedule_on) AND TIME(schedule_off))
+          OR
+          (TIME(schedule_off) < TIME(schedule_on) AND NOW() < TIME(schedule_on) AND NOW() < TIME(schedule_off))
+          OR
+          (TIME(schedule_off) < TIME(schedule_on) AND NOW() > TIME(schedule_on)));
     `;
-  db.query(
-    selectAffectedQuery,
-    [currentTime],
-    (err, selectedResult) => {
-      console.log(selectedResult);
-      db.query(
-        toggleOnQuery,
-        [currentTime],
-        (err, updatedResult) => {
-          console.log("Devices toggled on:", updatedResult.affectedRows);
-          console.log(updatedResult);
-          //   const notificationMessage = `Device ${device_id} status changed to ${status}`;
-          //   const insertNotification =
-          //     "INSERT INTO notifications (user_id, message) VALUES (?, ?)";
-          //   db.query(
-          //     insertNotification,
-          //     [user_id, notificationMessage],
-          //     (err, result) => {
-          //       if (err) {
-          //         console.error("Error inserting notification:", err);
-          //         return res.status(500).send("Server error");
-          //       }
-
-          //       const notification = {
-          //         user_id,
-          //         message: notificationMessage,
-          //         read: false,
-          //       };
-          //       io.emit("notification", notification); // Emit notification to all connected clients
-
-          //       res.send("Device status updated and notification sent");
-          //     }
-          //   );
-        }
-      );
+  db.query(selectAffectedQuery, [], (err, selectedResult) => {
+    if (err) {
+      console.log(err);
+      return;
     }
-  );
+    console.log(selectedResult);
+    db.query(toggleOnQuery, [], (err, updatedResult) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      console.log("Devices toggled on:", updatedResult?.affectedRows);
+      console.log(updatedResult);
+      if (selectedResult.length) createDeviceStatusChangeNotification(selectedResult, "on");
+    });
+  });
 };
 
 module.exports = toggleDevicesOn;
