@@ -67,7 +67,6 @@ const updateLocationByLocationId = (req, res) => {
         UPDATE locations 
         SET ${updates.join(", ")} 
         WHERE location_id = ? AND user_id = ?;
-        
     `;
 
   db.query(query, values, (err, result) => {

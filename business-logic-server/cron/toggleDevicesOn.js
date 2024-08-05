@@ -33,14 +33,12 @@ const toggleDevicesOn = () => {
       console.log(err);
       return;
     }
-    console.log(selectedResult);
     db.query(toggleOnQuery, [], (err, updatedResult) => {
       if (err) {
         console.log(err);
         return;
       }
       console.log("Devices toggled on:", updatedResult?.affectedRows);
-      console.log(updatedResult);
       if (selectedResult.length) createDeviceStatusChangeNotification(selectedResult, "on");
     });
   });

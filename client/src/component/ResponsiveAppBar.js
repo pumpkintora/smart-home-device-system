@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
+import Popover from "@mui/material/Popover";
 import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
@@ -12,14 +13,25 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 import { useNavigate } from "react-router-dom";
+import { businessLogicAxiosInstance as axios } from "../utils/axios";
+import { useSelector } from "react-redux";
 
-const pages = [{ title: "Home", href: "/" }, { title: "User Profile", href: "/user/profile" }];
+const pages = [
+  { title: "Home", href: "/" },
+  { title: "User Profile", href: "/user/profile" },
+];
 
 function ResponsiveAppBar() {
+  const user = useSelector((state) => state.user);
+  console.log(user);
   const navigate = useNavigate();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [anchorElNotification, setAnchorElNotification] = React.useState(null);
+  const [notification, setNotification] = React.useState([]);
+  const openNotification = Boolean(anchorElNotification);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -36,12 +48,30 @@ function ResponsiveAppBar() {
     setAnchorElUser(null);
   };
 
+  const handleOpenNotificationMenu = (e) => {
+    setAnchorElNotification(e.currentTarget);
+    axios.put("/notification/read", notification)
+      .then(res => console.log(res.data))
+  };
+
+  const handleCloseNotificationMenu = () => {
+    setAnchorElNotification(null);
+  };
+
   const logout = () => {
-    clearTimeout(localStorage.getItem("timerId"))
-    localStorage.removeItem("token")
-    localStorage.removeItem("timerId")
-    navigate("/login")
-  }
+    clearTimeout(localStorage.getItem("timerId"));
+    localStorage.removeItem("token");
+    localStorage.removeItem("timerId");
+    navigate("/login");
+  };
+
+  React.useEffect(() => {
+    async function fetchData() {
+      const res = await axios.get(`/notification/${user.user_id}`);
+      setNotification(res.data);
+    }
+    fetchData();
+  }, []);
 
   return (
     <AppBar position="static">
@@ -115,10 +145,36 @@ function ResponsiveAppBar() {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
+            <IconButton onClick={handleOpenNotificationMenu} sx={{ mr: 2 }}>
+              <NotificationsIcon fontSize="large" />
+            </IconButton>
+            <Popover
+              open={openNotification}
+              anchorEl={anchorElNotification}
+              onClose={handleCloseNotificationMenu}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              sx={{ height: 300 }}
+            >
+              {notification.map(notif => <Typography sx={{ p: 2 }}>{notif.message}</Typography>)}
+            </Popover>
             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
               <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
             </IconButton>
-            <Button color="secondary" variant="contained" onClick={logout} sx={{ ml: 2 }}>LOGOUT</Button>
+            <Button
+              color="secondary"
+              variant="contained"
+              onClick={logout}
+              sx={{ ml: 2 }}
+            >
+              LOGOUT
+            </Button>
           </Box>
         </Toolbar>
       </Container>

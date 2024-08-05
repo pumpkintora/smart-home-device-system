@@ -9,6 +9,7 @@ const io = require('socket.io')(3003);
 const { verifyJWT } = require("./middleware/verifyJWT");
 const locationController = require("./controller/location.controller")
 const deviceController = require("./controller/device.controller")
+const notificationController = require("./controller/notification.controller")
 const toggleDevicesOn = require("./cron/toggleDevicesOn")
 const toggleDevicesOff = require("./cron/toggleDevicesOff")
 const resetManualOverride = require("./cron/resetManualOverride")
@@ -47,7 +48,7 @@ io.on('connection', (socket) => {
 });
 
 // Schedule the toggle functions to run every minute
-cron.schedule('* * * * *', () => {
+cron.schedule('0 * * * *', () => {
   toggleDevicesOn();
   toggleDevicesOff();
 });
@@ -70,6 +71,10 @@ app.put('/device/:deviceId', verifyJWT, deviceController.updateDeviceByDeviceId)
 app.post('/device/:deviceId/on', verifyJWT, deviceController.turnOnDevice);
 app.post('/device/:deviceId/off', verifyJWT, deviceController.turnOffDevice);
 app.delete('/device/:deviceId', verifyJWT, deviceController.deleteDeviceByDeviceId);
+
+// notification API
+app.get("/notification/:userId", verifyJWT, notificationController.getAllNotificationByUserId)
+app.put("/notification/read", verifyJWT, notificationController.readNotificationById)
 
 app.post("/location/", verifyJWT, (req, res) => {});
 
