@@ -46,11 +46,17 @@ export default function DeviceModal({
   const [scheduleOff, setScheduleOff] = React.useState(null);
   const [status, setStatus] = React.useState(null);
 
+  
   const handleEditDevice = () => {
+    // dayjs bug, 8 hours difference
+    const d1 = new Date(scheduleOn)
+    d1.setHours(d1.getHours() + 8)
+    const d2 = new Date(scheduleOff)
+    d2.setHours(d2.getHours() + 8)
     axios
       .put(`/device/${device.device_id}`, {
-        schedule_on: scheduleOn,
-        schedule_off: scheduleOff,
+        schedule_on: d1.toISOString(),
+        schedule_off: d2.toISOString(),
         devicetype_id: deviceType,
         location_id: locationId,
         status,
@@ -105,10 +111,10 @@ export default function DeviceModal({
     if (isEditDevice) {
       setDeviceType(device.devicetype_id);
       setScheduleOn(
-        device.schedule_on !== null ? dayjs(device.schedule_on) : null
+        device.schedule_on !== null ? device.schedule_on : null
       );
       setScheduleOff(
-        device.schedule_off !== null ? dayjs(device.schedule_off) : null
+        device.schedule_off !== null ? device.schedule_off : null
       );
       setStatus(device.status);
     }
@@ -141,15 +147,15 @@ export default function DeviceModal({
             <FormControl fullWidth>
               <TimePicker
                 label="Turn on at"
-                value={scheduleOn}
-                onChange={(newValue) => setScheduleOn(newValue)}
+                value={dayjs(scheduleOn)}
+                onChange={(newValue) => setScheduleOn(newValue.toString())}
               />
             </FormControl>
             <FormControl fullWidth>
               <TimePicker
                 label="Turn off at"
-                value={scheduleOff}
-                onChange={(newValue) => setScheduleOff(newValue)}
+                value={dayjs(scheduleOff)}
+                onChange={(newValue) => setScheduleOff(newValue.toString())}
               />
             </FormControl>
             <ToggleButtonGroup

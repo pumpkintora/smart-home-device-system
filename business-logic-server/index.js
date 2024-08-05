@@ -47,7 +47,7 @@ io.on('connection', (socket) => {
 });
 
 // Schedule the toggle functions to run every minute
-cron.schedule('0 * * * *', () => {
+cron.schedule('* * * * *', () => {
   toggleDevicesOn();
   toggleDevicesOff();
 });

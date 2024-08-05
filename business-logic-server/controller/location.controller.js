@@ -90,10 +90,10 @@ const updateLocationByLocationId = (req, res) => {
 const deleteLocationByLocationId = (req, res) => {
   const { locationId } = req.params;
 
-  const query = "DELETE FROM locations WHERE location_id = ?";
+  const query = `DELETE FROM devices WHERE location_id = ?; `;
   db.query(query, [locationId], (err, result) => {
     if (err) {
-      console.error("Error deleting device:", err);
+      console.error("Error deleting location:", err);
       res.status(500).send("Server error");
       return;
     }
@@ -101,7 +101,14 @@ const deleteLocationByLocationId = (req, res) => {
       res.status(404).send("Device not found");
       return;
     }
-    res.send("Device deleted successfully");
+    db.query(`DELETE FROM locations WHERE location_id = ?;`, [locationId], (err, result) => {
+      if (err) {
+        console.error("Error deleting device:", err);
+        res.status(500).send("Server error");
+        return;
+      }
+      res.send("Device deleted successfully");
+    })
   });
 };
 

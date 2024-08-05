@@ -46,11 +46,11 @@ const updateDeviceByDeviceId = (req, res) => {
 
   if (schedule_on) {
     updates.push("schedule_on = ?");
-    values.push(formatDateForSql(schedule_on));
+    values.push(schedule_on.slice(0, 19).replace("T", " "));
   }
   if (schedule_off) {
     updates.push("schedule_off = ?");
-    values.push(formatDateForSql(schedule_off));
+    values.push(schedule_off.slice(0, 19).replace("T", " "));
   }
   if (devicetype_id) {
     updates.push("devicetype_id = ?");
