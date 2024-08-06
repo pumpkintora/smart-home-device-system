@@ -1,6 +1,6 @@
 ARG NODE_VERSION=18.16.0
 
-FROM node:${NODE_VERSION}-alpine
+FROM node:${NODE_VERSION}-alpine as build-stage
 
 # WORKDIR /usr/src/app
 
@@ -11,6 +11,7 @@ FROM node:${NODE_VERSION}-alpine
 # RUN --mount=type=bind,source=package.json,target=package.json \
 #     --mount=type=cache,target=/root/.npm \
 #     npm ci --omit=dev
+WORKDIR /frontend
 
 COPY . .
 
@@ -22,13 +23,13 @@ ENV REACT_APP_USER_SERVER_API=$REACT_APP_USER_SERVER_API
 ARG REACT_APP_BUSINESS_SERVER_API
 ENV REACT_APP_BUSINESS_SERVER_API=$REACT_APP_BUSINESS_SERVER_API
 
+RUN npm run build
 
-# USER node
-
-# Stage 2
 FROM nginx:1.17.0-alpine
 
-COPY --from=build-stage /bezkoder-ui/build /usr/share/nginx/html
+COPY --from=build-stage /frontend/build /usr/share/nginx/html
+
 EXPOSE 3000
 
 CMD nginx -g 'daemon off;'
+# USER node

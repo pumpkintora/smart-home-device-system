@@ -22,7 +22,7 @@ services:
     ports:
       - "${USER_SERVER_LOCAL_PORT}:${USER_SERVER_DOCKER_PORT}"
     command: npm run prod
-  
+
   business-logic-backend:
     depends_on:
       - mysqldb
@@ -51,18 +51,15 @@ services:
       args:
         - REACT_APP_USER_SERVER_API=http://localhost:3001
         - REACT_APP_BUSINESS_SERVER_API=http://localhost:3002
-    container_name: frontend
-    working_dir: /usr/src/app
-    networks:
-      - node-network
-    tty: true
     ports:
       - "${CLIENT_LOCAL_PORT}:${CLIENT_DOCKER_PORT}"
-    command: npm start
-  
+    networks:
+      - node-network
+    # command: npm start
+
   mysqldb:
     image: mysql:latest
-    # build: 
+    # build:
     #   context: sql
     ports:
       - "${MYSQLDB_LOCAL_PORT}:${MYSQLDB_DOCKER_PORT}"
@@ -76,11 +73,20 @@ services:
     networks:
       - node-network
     healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       retries: 10
       interval: 3s
       timeout: 30s
 
+  # nginx:
+  #   depends_on:
+  #     - frontend
+  #   restart: always
+  #   build:
+  #     context: ./nginx
+  #   ports:
+  #     - "80:80"
+    
   # nginx:
   #   build:
   #     context: nginx
