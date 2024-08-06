@@ -55,7 +55,7 @@ services:
         - REACT_APP_USER_SERVER_API=http://localhost:3001
         - REACT_APP_BUSINESS_SERVER_API=http://localhost:3002
     ports:
-      - "3000:80"
+      - "80:80"
     # networks:
     #   - node-network
     # command: npm start
