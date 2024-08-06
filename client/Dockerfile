@@ -25,11 +25,13 @@ ENV REACT_APP_BUSINESS_SERVER_API=$REACT_APP_BUSINESS_SERVER_API
 
 RUN npm run build
 
-FROM nginx:1.17.0-alpine
+EXPOSE 3000
 
-COPY --from=build-stage /frontend/build /usr/share/nginx/html
+# FROM nginx:1.17.0-alpine
 
-EXPOSE 80
+# COPY --from=build-stage /frontend/build /usr/share/nginx/html
 
-CMD nginx -g 'daemon off;'
+# EXPOSE 80
+
+# CMD nginx -g 'daemon off;'
 # USER node
