@@ -17,8 +17,8 @@ services:
       - DB_PASSWORD=admin
       - DB_NAME=smarthome
       - DB_PORT=3306
-    networks:
-      - node-network
+    # networks:
+    #   - node-network
     tty: true
     ports:
       - "3001:3001"
@@ -40,8 +40,8 @@ services:
       - DB_PASSWORD=admin
       - DB_NAME=smarthome
       - DB_PORT=3306
-    networks:
-      - node-network
+    # networks:
+    #   - node-network
     tty: true
     ports:
       - "3002:3002"
@@ -56,8 +56,8 @@ services:
         - REACT_APP_BUSINESS_SERVER_API=http://localhost:3002
     ports:
       - "3000:80"
-    networks:
-      - node-network
+    # networks:
+    #   - node-network
     # command: npm start
 
   mysqldb:
@@ -73,8 +73,8 @@ services:
     volumes:
       # - mysql-data:/var/lib/mysql
       - ./sql-init:/docker-entrypoint-initdb.d/
-    networks:
-      - node-network
+    # networks:
+    #   - node-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       retries: 10
@@ -105,6 +105,6 @@ services:
   #     - business-logic-backend
   #     - frontend
 
-networks:
-  node-network:
-    driver: bridge
+# networks:
+#   node-network:
+#     driver: bridge
