@@ -115,4 +115,4 @@ services:
   #     - frontend
 networks:
   node-network:
-    driver: bridge
+    # driver: bridge
