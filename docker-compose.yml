@@ -13,15 +13,15 @@ services:
     env_file: ./.env
     environment:
       - DB_HOST=mysqldb
-      - DB_USER=${MYSQLDB_USER}
-      - DB_PASSWORD=${MYSQLDB_ROOT_PASSWORD}
-      - DB_NAME=${MYSQLDB_DATABASE}
-      - DB_PORT=${MYSQLDB_DOCKER_PORT}
+      - DB_USER=root
+      - DB_PASSWORD=admin
+      - DB_NAME=smarthome
+      - DB_PORT=3306
     networks:
       - node-network
     tty: true
     ports:
-      - "${USER_SERVER_LOCAL_PORT}:${USER_SERVER_DOCKER_PORT}"
+      - "3001:3001"
     command: npm run prod
 
   business-logic-backend:
@@ -36,15 +36,15 @@ services:
     env_file: ./.env
     environment:
       - DB_HOST=mysqldb
-      - DB_USER=${MYSQLDB_USER}
-      - DB_PASSWORD=${MYSQLDB_ROOT_PASSWORD}
-      - DB_NAME=${MYSQLDB_DATABASE}
-      - DB_PORT=${MYSQLDB_DOCKER_PORT}
+      - DB_USER=root
+      - DB_PASSWORD=admin
+      - DB_NAME=smarthome
+      - DB_PORT=3306
     networks:
       - node-network
     tty: true
     ports:
-      - "${BUSINESS_SERVER_LOCAL_PORT}:${BUSINESS_SERVER_DOCKER_PORT}"
+      - "3002:3002"
     command: npm run prod
 
   frontend:
@@ -55,7 +55,7 @@ services:
         - REACT_APP_USER_SERVER_API=http://localhost:3001
         - REACT_APP_BUSINESS_SERVER_API=http://localhost:3002
     ports:
-      - "${CLIENT_LOCAL_PORT}:${CLIENT_DOCKER_PORT}"
+      - "3000:80"
     networks:
       - node-network
     # command: npm start
@@ -65,7 +65,7 @@ services:
     # build:
     #   context: sql
     ports:
-      - "${MYSQLDB_LOCAL_PORT}:${MYSQLDB_DOCKER_PORT}"
+      - "3306:3306"
     restart: always
     environment:
       MYSQL_DATABASE: smarthome
