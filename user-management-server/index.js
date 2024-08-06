@@ -75,10 +75,10 @@ app.post("/register", (req, res) => {
       console.log(err);
     }
     db.execute(
-      "INSERT INTO users (username, password) VALUES (?,?)",
-      [username, hash],
+      "INSERT INTO users (username, email, password) VALUES (?,?,?)",
+      [username, email, hash],
       (err, result) => {
-        console.log(err);
+        if (err) res.status(409).send(err.message)
       }
     );
   });
@@ -137,7 +137,7 @@ app.put("/user/:userId", verifyJWT, (req, res) => {
   db.query(query, [username, email, userId], (err, result) => {
     if (err) {
       console.error("Error updating user:", err);
-      res.status(500).send("Server error");
+      res.status(500).send(err.message);
       return;
     }
     if (result.affectedRows === 0) {

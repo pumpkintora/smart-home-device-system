@@ -39,20 +39,24 @@ export default function DeviceModal({
 }) {
   const { locationId } = useParams();
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setScheduleOn(null);
+    setScheduleOff(null);
+    setStatus(null);
+  };
   const isEditDevice = Boolean(device);
   const [deviceType, setDeviceType] = React.useState(1);
   const [scheduleOn, setScheduleOn] = React.useState(null);
   const [scheduleOff, setScheduleOff] = React.useState(null);
   const [status, setStatus] = React.useState(null);
 
-  
   const handleEditDevice = () => {
     // dayjs bug, 8 hours difference
-    const d1 = new Date(scheduleOn)
-    d1.setHours(d1.getHours() + 8)
-    const d2 = new Date(scheduleOff)
-    d2.setHours(d2.getHours() + 8)
+    const d1 = new Date(scheduleOn);
+    d1.setHours(d1.getHours() + 8);
+    const d2 = new Date(scheduleOff);
+    d2.setHours(d2.getHours() + 8);
     axios
       .put(`/device/${device.device_id}`, {
         schedule_on: d1.toISOString(),
@@ -74,10 +78,15 @@ export default function DeviceModal({
   };
 
   const handleAddNewDevice = () => {
+    // dayjs bug, 8 hours difference
+    const d1 = new Date(scheduleOn);
+    d1.setHours(d1.getHours() + 8);
+    const d2 = new Date(scheduleOff);
+    d2.setHours(d2.getHours() + 8);
     axios
       .post("/location/add-device", {
-        schedule_on: scheduleOn,
-        schedule_off: scheduleOff,
+        schedule_on: d1.toISOString(),
+        schedule_off: d2.toISOString(),
         devicetype_id: deviceType,
         location_id: locationId,
         status,
@@ -98,24 +107,20 @@ export default function DeviceModal({
   };
 
   const handleToggle = (e, newValue) => {
-    if (status !== newValue) {
-      axios
-        .post(`/device/${device.device_id}/${newValue}`)
-        .then((res) =>
-          setStatus(newValue)
-        );
-    }
+    if (device) {
+      if (status !== newValue) {
+        axios
+          .post(`/device/${device.device_id}/${newValue}`)
+          .then((res) => setStatus(newValue));
+      }
+    } else setStatus(newValue);
   };
 
   React.useEffect(() => {
     if (isEditDevice) {
       setDeviceType(device.devicetype_id);
-      setScheduleOn(
-        device.schedule_on !== null ? device.schedule_on : null
-      );
-      setScheduleOff(
-        device.schedule_off !== null ? device.schedule_off : null
-      );
+      setScheduleOn(device.schedule_on !== null ? device.schedule_on : null);
+      setScheduleOff(device.schedule_off !== null ? device.schedule_off : null);
       setStatus(device.status);
     }
   }, [open]);
@@ -148,14 +153,16 @@ export default function DeviceModal({
               <TimePicker
                 label="Turn on at"
                 value={scheduleOn ? dayjs(scheduleOn) : null}
-                onChange={(newValue) => setScheduleOn(newValue.toString())}
+                onChange={(newValue) => setScheduleOn(newValue)}
+                // onChange={(newValue) => setScheduleOn(dayjs(newValue))}
               />
             </FormControl>
             <FormControl fullWidth>
               <TimePicker
                 label="Turn off at"
                 value={scheduleOff ? dayjs(scheduleOff) : null}
-                onChange={(newValue) => setScheduleOff(newValue.toString())}
+                onChange={(newValue) => setScheduleOff(newValue)}
+                // onChange={(newValue) => setScheduleOff(dayjs(newValue))}
               />
             </FormControl>
             <ToggleButtonGroup

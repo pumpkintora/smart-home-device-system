@@ -1,22 +1,24 @@
 import * as React from "react";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Popover from "@mui/material/Popover";
-import Menu from "@mui/material/Menu";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import {
+  Badge,
+  AppBar,
+  Box,
+  Toolbar,
+  IconButton,
+  Typography,
+  Popover,
+  Menu,
+  Container,
+  Avatar,
+  Button,
+  MenuItem,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
-import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import { useNavigate } from "react-router-dom";
 import { businessLogicAxiosInstance as axios } from "../utils/axios";
-import { useSelector } from "react-redux";
 
 const pages = [
   { title: "Home", href: "/" },
@@ -25,7 +27,6 @@ const pages = [
 
 function ResponsiveAppBar() {
   const user = useSelector((state) => state.user);
-  console.log(user);
   const navigate = useNavigate();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -50,8 +51,9 @@ function ResponsiveAppBar() {
 
   const handleOpenNotificationMenu = (e) => {
     setAnchorElNotification(e.currentTarget);
-    axios.put("/notification/read", notification)
-      .then(res => console.log(res.data))
+    axios
+      .put("/notification/read", notification)
+      .then((res) => console.log(res.data));
   };
 
   const handleCloseNotificationMenu = () => {
@@ -146,7 +148,9 @@ function ResponsiveAppBar() {
 
           <Box sx={{ flexGrow: 0 }}>
             <IconButton onClick={handleOpenNotificationMenu} sx={{ mr: 2 }}>
-              <NotificationsIcon fontSize="large" />
+              <Badge badgeContent={notification.length}>
+                <NotificationsIcon fontSize="large" />
+              </Badge>
             </IconButton>
             <Popover
               open={openNotification}
@@ -162,7 +166,9 @@ function ResponsiveAppBar() {
               }}
               sx={{ height: 300 }}
             >
-              {notification.map(notif => <Typography sx={{ p: 2 }}>{notif.message}</Typography>)}
+              {notification.map((notif) => (
+                <Typography sx={{ p: 2 }}>{notif.message}</Typography>
+              ))}
             </Popover>
             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
               <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
