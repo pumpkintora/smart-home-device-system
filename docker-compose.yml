@@ -12,15 +12,15 @@ services:
     env_file: ./.env
     environment:
       - DB_HOST=mysqldb
-      - DB_USER=$MYSQLDB_USER
-      - DB_PASSWORD=$MYSQLDB_ROOT_PASSWORD
-      - DB_NAME=$MYSQLDB_DATABASE
-      - DB_PORT=$MYSQLDB_DOCKER_PORT
+      - DB_USER=${MYSQLDB_USER}
+      - DB_PASSWORD=${MYSQLDB_ROOT_PASSWORD}
+      - DB_NAME=${MYSQLDB_DATABASE}
+      - DB_PORT=${MYSQLDB_DOCKER_PORT}
     networks:
       - node-network
     tty: true
     ports:
-      - $USER_SERVER_LOCAL_PORT:$USER_SERVER_DOCKER_PORT
+      - "${USER_SERVER_LOCAL_PORT}:${USER_SERVER_DOCKER_PORT}"
     command: npm run prod
   
   business-logic-backend:
@@ -34,15 +34,15 @@ services:
     env_file: ./.env
     environment:
       - DB_HOST=mysqldb
-      - DB_USER=$MYSQLDB_USER
-      - DB_PASSWORD=$MYSQLDB_ROOT_PASSWORD
-      - DB_NAME=$MYSQLDB_DATABASE
-      - DB_PORT=$MYSQLDB_DOCKER_PORT
+      - DB_USER=${MYSQLDB_USER}
+      - DB_PASSWORD=${MYSQLDB_ROOT_PASSWORD}
+      - DB_NAME=${MYSQLDB_DATABASE}
+      - DB_PORT=${MYSQLDB_DOCKER_PORT}
     networks:
       - node-network
     tty: true
     ports:
-      - $BUSINESS_SERVER_LOCAL_PORT:$BUSINESS_SERVER_DOCKER_PORT
+      - "${BUSINESS_SERVER_LOCAL_PORT}:${BUSINESS_SERVER_DOCKER_PORT}"
     command: npm run prod
 
   frontend:
@@ -57,7 +57,7 @@ services:
       - node-network
     tty: true
     ports:
-      - $CLIENT_LOCAL_PORT:$CLIENT_DOCKER_PORT
+      - "${CLIENT_LOCAL_PORT}:${CLIENT_DOCKER_PORT}"
     command: npm start
   
   mysqldb:
@@ -65,7 +65,7 @@ services:
     # build: 
     #   context: sql
     ports:
-      - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
+      - "${MYSQLDB_LOCAL_PORT}:${MYSQLDB_DOCKER_PORT}"
     restart: always
     environment:
       MYSQL_DATABASE: smarthome
