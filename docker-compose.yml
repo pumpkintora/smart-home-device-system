@@ -2,6 +2,7 @@ version: "3"
 
 services:
   user-management-backend:
+    image: 127.0.0.1:5000/smarthome-user-backend
     depends_on:
       - mysqldb
     build:
@@ -24,6 +25,7 @@ services:
     command: npm run prod
 
   business-logic-backend:
+    image: 127.0.0.1:5000/smarthome-business-backend
     depends_on:
       - mysqldb
     build:
@@ -46,6 +48,7 @@ services:
     command: npm run prod
 
   frontend:
+    image: 127.0.0.1:5000/smarthome-frontend
     build:
       context: client
       args:
