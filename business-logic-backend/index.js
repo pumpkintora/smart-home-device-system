@@ -20,7 +20,7 @@ app.use(express.json());
 // app.use(cors());
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000", "http://localhost"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -57,26 +57,24 @@ cron.schedule('0 * * * *', () => {
 cron.schedule('0 0 * * *', resetManualOverride);
 
 // location API
-app.post("/location", verifyJWT, locationController.createLocationByUserId);
-app.get("/location/all", verifyJWT, locationController.getAllLocationByUserId);
-app.get("/location/:locationId", verifyJWT, locationController.getLocationByLocationId);
-app.put("/location/:locationId", verifyJWT, locationController.updateLocationByLocationId);
-app.delete("/location/:locationId", verifyJWT, locationController.deleteLocationByLocationId);
-app.post("/location/add-device", verifyJWT, locationController.addDeviceToLocation);
+app.post("/api/biz/location", verifyJWT, locationController.createLocationByUserId);
+app.get("/api/biz/location/all", verifyJWT, locationController.getAllLocationByUserId);
+app.get("/api/biz/location/:locationId", verifyJWT, locationController.getLocationByLocationId);
+app.put("/api/biz/location/:locationId", verifyJWT, locationController.updateLocationByLocationId);
+app.delete("/api/biz/location/:locationId", verifyJWT, locationController.deleteLocationByLocationId);
+app.post("/api/biz/location/add-device", verifyJWT, locationController.addDeviceToLocation);
 
 // device API
-app.get("/device/:locationId", verifyJWT, deviceController.getAllDeviceByLocationId);
-app.get("/device-type/all", verifyJWT, deviceController.getAllDeviceType);
-app.put('/device/:deviceId', verifyJWT, deviceController.updateDeviceByDeviceId);
-app.post('/device/:deviceId/on', verifyJWT, deviceController.turnOnDevice);
-app.post('/device/:deviceId/off', verifyJWT, deviceController.turnOffDevice);
-app.delete('/device/:deviceId', verifyJWT, deviceController.deleteDeviceByDeviceId);
+app.get("/api/biz/device/:locationId", verifyJWT, deviceController.getAllDeviceByLocationId);
+app.get("/api/biz/device-type/all", verifyJWT, deviceController.getAllDeviceType);
+app.put('/api/biz/device/:deviceId', verifyJWT, deviceController.updateDeviceByDeviceId);
+app.post('/api/biz/device/:deviceId/on', verifyJWT, deviceController.turnOnDevice);
+app.post('/api/biz/device/:deviceId/off', verifyJWT, deviceController.turnOffDevice);
+app.delete('/api/biz/device/:deviceId', verifyJWT, deviceController.deleteDeviceByDeviceId);
 
 // notification API
-app.get("/notification/:userId", verifyJWT, notificationController.getAllNotificationByUserId)
-app.put("/notification/read", verifyJWT, notificationController.readNotificationById)
-
-app.post("/location/", verifyJWT, (req, res) => {});
+app.get("/api/biz/notification/:userId", verifyJWT, notificationController.getAllNotificationByUserId)
+app.put("/api/biz/notification/read", verifyJWT, notificationController.readNotificationById)
 
 const PORT = process.env.SERVER_DOCKER_PORT || 3002;
 

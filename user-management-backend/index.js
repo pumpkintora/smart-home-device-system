@@ -19,7 +19,7 @@ app.use(express.json());
 // app.use(cors());
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000", "http://localhost"],
     methods: ["GET", "POST", "PUT"],
     credentials: true,
   })
@@ -65,7 +65,7 @@ const verifyJWT = (req, res, next) => {
   }
 };
 
-app.post("/register", (req, res) => {
+app.post("/api/user/register", (req, res) => {
   const username = req.body.username;
   const email = req.body.email;
   const password = req.body.password;
@@ -84,11 +84,11 @@ app.post("/register", (req, res) => {
   });
 });
 
-app.get("/isUserAuth", verifyJWT, (req, res) => {
+app.get("/api/user/isUserAuth", verifyJWT, (req, res) => {
   res.send({ authenticated: true });
 });
 
-app.post("/login", (req, res) => {
+app.post("/api/user/login", (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
 
@@ -130,7 +130,7 @@ app.post("/login", (req, res) => {
   );
 });
 
-app.put("/user/:userId", verifyJWT, (req, res) => {
+app.put("/api/user/user/:userId", verifyJWT, (req, res) => {
   const { userId } = req.params;
   const { username, email } = req.body;
   const query = "UPDATE users SET username = ?, email = ? WHERE user_id = ?";
@@ -151,7 +151,7 @@ app.put("/user/:userId", verifyJWT, (req, res) => {
   });
 });
 
-app.post("/user/:userId/change-password", verifyJWT, (req, res) => {
+app.post("/api/user/user/:userId/change-password", verifyJWT, (req, res) => {
   const { userId } = req.params;
   const { currentPassword, newPassword } = req.body;
 
